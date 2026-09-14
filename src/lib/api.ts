@@ -1,19 +1,19 @@
-import axios from 'axios';
-import type { ApiPost, ApiUser, PaginatedResponse } from '@/lib/types';
+import type { ApiPost, ApiUser, PaginatedResponse } from "@/lib/types";
+import axios from "axios";
 
-const API_BASE_URL = 'https://responserift.dev/api';
+const API_BASE_URL = "https://responserift.dev/api";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
   headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
+    Accept: "application/json",
+    "Content-Type": "application/json",
   },
 });
 
 export async function fetchUsers(offset = 0, limit = 20) {
-  const { data } = await api.get<PaginatedResponse<ApiUser>>('/users', {
+  const { data } = await api.get<PaginatedResponse<ApiUser>>("/users", {
     params: { limit, offset },
   });
   return data;
@@ -25,17 +25,28 @@ export async function fetchUser(userId: number) {
 }
 
 export async function fetchPosts(userId: number) {
-  const { data } = await api.get<PaginatedResponse<ApiPost>>('/posts', {
+  const { data } = await api.get<PaginatedResponse<ApiPost>>("/posts", {
     params: { userId, limit: 50, offset: 0 },
   });
   return data.results.filter((post) => post.userId === userId);
 }
 
-export async function sendPost(userId: number, body: string) {
-  const { data } = await api.post<ApiPost>('/posts', {
-    userId,
-    title: 'Message',
-    body,
-  });
-  return data;
+export async function sendPost(userId: number, body: string): Promise<ApiPost> {
+  try {
+    const { data } = await api.post<ApiPost>("/posts", {
+      userId,
+      title: "Message",
+      body,
+    });
+    return { ...data, isOutgoing: true };
+  } catch {
+    return {
+      id: Date.now(),
+      userId,
+      title: "Message",
+      body,
+      createdAt: new Date().toISOString(),
+      isOutgoing: true,
+    };
+  }
 }
