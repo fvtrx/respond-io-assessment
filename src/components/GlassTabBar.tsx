@@ -35,12 +35,12 @@ export function GlassTabBar({ tabs, activeTab, onTabPress }: GlassTabBarProps) {
 
   return (
     <View
-      style={[styles.wrapper, { paddingBottom: Math.max(insets.bottom, 12) }]}
+      style={[styles.wrapper, { paddingBottom: Math.max(insets.bottom, 8) }]}
     >
       <BlurView
-        tint={theme.colors.background === "#f4f2fc" ? "light" : "dark"}
-        intensity={65}
-        experimentalBlurMethod="dimezisBlurView"
+        tint="light"
+        intensity={40}
+        blurMethod="dimezisBlurView"
         style={styles.blurContainer}
       >
         <View style={styles.pillInner}>
@@ -60,13 +60,13 @@ export function GlassTabBar({ tabs, activeTab, onTabPress }: GlassTabBarProps) {
                   style={[styles.iconWrap, focused && styles.iconWrapActive]}
                 >
                   <Icon
-                    size={focused ? 24 : 22}
+                    size={21}
                     color={
                       focused
                         ? theme.colors.primary[500]
                         : theme.colors.neutral[400]
                     }
-                    strokeWidth={focused ? 2.4 : 2}
+                    strokeWidth={focused ? 2.3 : 2}
                   />
                 </View>
                 <Text
@@ -75,11 +75,6 @@ export function GlassTabBar({ tabs, activeTab, onTabPress }: GlassTabBarProps) {
                 >
                   {tab.label}
                 </Text>
-                {focused ? (
-                  <View style={styles.activeIndicator} />
-                ) : (
-                  <View style={styles.inactiveIndicator} />
-                )}
               </TouchableOpacity>
             );
           })}
@@ -98,23 +93,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   blurContainer: {
-    borderRadius: 28,
+    borderRadius: 20,
     overflow: "hidden",
+    borderWidth: 0.5,
+    borderColor: "rgba(255,255,255,0.6)",
     ...Platform.select({
       ios: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.12,
-        shadowRadius: 16,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
       },
       android: {
-        elevation: 10,
+        elevation: 6,
       },
       default: {
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.12,
-        shadowRadius: 16,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
       },
     }),
   },
@@ -122,48 +119,34 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    paddingVertical: 10,
-    paddingHorizontal: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
     backgroundColor:
-      Platform.OS === "web" ? "rgba(255,255,255,0.82)" : "transparent",
+      Platform.OS === "web" ? "rgba(255,255,255,0.72)" : "transparent",
   },
   tabItem: {
     flex: 1,
     alignItems: "center",
-    gap: 4,
-    paddingVertical: 4,
+    gap: 3,
+    paddingVertical: 2,
   },
   iconWrap: {
     alignItems: "center",
     justifyContent: "center",
-    height: 32,
-    width: 56,
-    borderRadius: 16,
+    height: 30,
+    width: 48,
+    borderRadius: 15,
   },
   iconWrapActive: {
     backgroundColor: theme.colors.primary[50],
   },
   label: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: theme.typography.fontFamilyMedium,
     color: theme.colors.neutral[400],
   },
   labelActive: {
     color: theme.colors.primary[500],
     fontFamily: theme.typography.fontFamilySemiBold,
-  },
-  activeIndicator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: theme.colors.primary[500],
-    marginTop: 2,
-  },
-  inactiveIndicator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: "transparent",
-    marginTop: 2,
   },
 });
