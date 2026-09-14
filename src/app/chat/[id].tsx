@@ -1,6 +1,7 @@
 import { Avatar } from "@/components/Avatar";
 import { EmptyState } from "@/components/EmptyState";
 import { MessageBubble } from "@/components/MessageBubble";
+import { MessageSkeleton } from "@/components/MessageSkeleton";
 import { useMessages, useSendMessage } from "@/hooks/queries";
 import { theme } from "@/lib/theme";
 import type { Message } from "@/lib/types";
@@ -16,10 +17,11 @@ import {
   Smile,
   Video,
 } from "lucide-react-native";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -39,6 +41,7 @@ export default function ChatScreen() {
   const contactName = params.name ?? "Contact";
   const contactAvatar = params.avatar || undefined;
   const insets = useSafeAreaInsets();
+  const scrollRef = useRef<ScrollView>(null);
 
   const {
     data: posts,
@@ -51,8 +54,19 @@ export default function ChatScreen() {
   const [draft, setDraft] = useState("");
 
   const messages: Message[] = useMemo(() => {
-    return (posts ?? []).map((p) => ({ ...p, direction: "incoming" as const }));
+    return (posts ?? []).map((p) => ({
+      ...p,
+      direction: p.isOutgoing ? ("outgoing" as const) : ("incoming" as const),
+    }));
   }, [posts]);
+
+  useEffect(() => {
+    if (messages.length > 0 && !isLoading) {
+      setTimeout(() => {
+        scrollRef.current?.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages.length, isLoading]);
 
   const handleSend = useCallback(() => {
     const body = draft.trim();
@@ -116,14 +130,13 @@ export default function ChatScreen() {
       </View>
 
       {isLoading ? (
-        <View style={styles.centerContent}>
-          <RefreshCw
-            size={32}
-            color={theme.colors.neutral[300]}
-            strokeWidth={2}
-          />
-          <Text style={styles.loadingText}>Loading messages...</Text>
-        </View>
+        <ScrollView
+          style={styles.messageList}
+          contentContainerStyle={{ paddingVertical: theme.spacing.md }}
+          showsVerticalScrollIndicator={false}
+        >
+          <MessageSkeleton />
+        </ScrollView>
       ) : isError ? (
         <EmptyState
           title="Couldn't load messages"
@@ -150,16 +163,25 @@ export default function ChatScreen() {
         />
       ) : (
         <ScrollView
+          ref={scrollRef}
           style={styles.messageList}
           contentContainerStyle={{
             paddingVertical: theme.spacing.md,
             paddingBottom: insets.bottom + 90,
           }}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={refetch}
+              tintColor={theme.colors.primary[500]}
+              colors={[theme.colors.primary[500]]}
+            />
+          }
         >
-          {messages.map((msg) => (
+          {messages.map((msg, index) => (
             <MessageBubble
-              key={String(msg.id)}
+              key={`${msg.id}-${msg.createdAt ?? "no-date"}-${index}`}
               body={msg.body}
               direction={msg.direction}
               createdAt={msg.createdAt}
@@ -293,17 +315,6 @@ const styles = StyleSheet.create({
   },
   messageList: {
     flex: 1,
-  },
-  centerContent: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: theme.spacing.sm,
-  },
-  loadingText: {
-    fontSize: theme.typography.body,
-    fontFamily: theme.typography.fontFamilyRegular,
-    color: theme.colors.textSecondary,
   },
   errorBar: {
     backgroundColor: theme.colors.error + "1a",

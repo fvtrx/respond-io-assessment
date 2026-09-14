@@ -1,8 +1,14 @@
 import { sendPost } from "@/lib/api";
 import { ApiPost } from "@/lib/types";
+import { useAuthStore } from "@/store/authStore";
+import { saveSentMessage, StoredMessage } from "@/utils/sentMessages";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const OPTIMISTIC_ID = -1;
+
+function getAccountId() {
+  return useAuthStore.getState().user?.id ?? "anon";
+}
 
 export function useSendMessage(userId: number) {
   const queryClient = useQueryClient();
@@ -36,6 +42,15 @@ export function useSendMessage(userId: number) {
       }
     },
     onSuccess: (newPost) => {
+      const accountId = getAccountId();
+      const stored: StoredMessage = {
+        id: newPost.id,
+        userId: newPost.userId,
+        body: newPost.body,
+        createdAt: newPost.createdAt ?? new Date().toISOString(),
+      };
+      saveSentMessage(accountId, userId, stored);
+
       queryClient.setQueryData<ApiPost[]>(queryKey, (old = []) => {
         const withoutOptimistic = old.filter((m) => m.id !== OPTIMISTIC_ID);
         return [...withoutOptimistic, newPost];
