@@ -7,9 +7,15 @@ import { theme } from "@/lib/theme";
 import type { ApiUser } from "@/lib/types";
 import { FlashList, type ListRenderItem } from "@shopify/flash-list";
 import { router } from "expo-router";
-import { MessageSquareOff, RefreshCw, Search } from "lucide-react-native";
+import {
+  ChevronRight,
+  MessageSquareOff,
+  RefreshCw,
+  Search,
+} from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import {
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -25,11 +31,25 @@ export default function ChatsScreen() {
     data,
     isLoading,
     isError,
+    refetch,
+    isRefetching,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   } = useContactsInfinite();
   const [search, setSearch] = useState("");
+  const [isManualRefreshing, setIsManualRefreshing] = useState(false);
+
+  const handleRefresh = useCallback(async () => {
+    setIsManualRefreshing(true);
+    try {
+      await refetch();
+    } finally {
+      setIsManualRefreshing(false);
+    }
+  }, [refetch]);
+
+  const isRefreshing = isRefetching || isManualRefreshing;
 
   const allContacts = useMemo(
     () => data?.pages.flatMap((p) => p.results) ?? [],
@@ -80,14 +100,14 @@ export default function ChatsScreen() {
           <View style={styles.pinnedSection}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Pinned Chats</Text>
-              {/* <TouchableOpacity style={styles.seeAll} activeOpacity={0.6}>
+              <TouchableOpacity style={styles.seeAll} activeOpacity={0.6}>
                 <Text style={styles.seeAllText}>See all</Text>
                 <ChevronRight
                   size={15}
                   color={theme.colors.primary[500]}
                   strokeWidth={2}
                 />
-              </TouchableOpacity> */}
+              </TouchableOpacity>
             </View>
             <ScrollView
               horizontal
@@ -110,6 +130,19 @@ export default function ChatsScreen() {
             </ScrollView>
           </View>
         ) : null}
+
+        {/* <View style={styles.categoryBar}>
+          {CATEGORIES.map((cat) => (
+            <TouchableOpacity
+              key={cat}
+              style={[styles.categoryPill, activeCategory === cat && styles.categoryPillActive]}
+              onPress={() => setActiveCategory(cat)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.categoryText, activeCategory === cat && styles.categoryTextActive]}>{cat}</Text>
+            </TouchableOpacity>
+          ))}
+        </View> */}
 
         {contacts.length > 0 ? (
           <Text style={styles.listHeading}>Recent Conversations</Text>
@@ -198,17 +231,36 @@ export default function ChatsScreen() {
             />
           </View>
         </View>
-        <EmptyState
-          title="Couldn't load conversations"
-          message="Pull down to try again."
-          icon={
-            <RefreshCw
-              size={40}
-              color={theme.colors.neutral[300]}
-              strokeWidth={2}
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingBottom: insets.bottom + 100,
+          }}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              tintColor={theme.colors.primary[500]}
+              colors={[theme.colors.primary[500]]}
             />
           }
-        />
+        >
+          <View style={styles.errorWrap}>
+            <EmptyState
+              title="Couldn't load conversations"
+              message="Pull down to refresh"
+              icon={
+                <RefreshCw
+                  size={40}
+                  color={theme.colors.neutral[300]}
+                  strokeWidth={2}
+                />
+              }
+            />
+          </View>
+        </ScrollView>
       </View>
     );
   }
@@ -246,6 +298,8 @@ export default function ChatsScreen() {
         onEndReachedThreshold={0.5}
         contentContainerStyle={{ paddingBottom: insets.bottom + 100 }}
         showsVerticalScrollIndicator={false}
+        refreshing={isRefreshing}
+        onRefresh={handleRefresh}
       />
     </View>
   );
@@ -375,5 +429,11 @@ const styles = StyleSheet.create({
   },
   emptyWrap: {
     paddingTop: theme.spacing.xl,
+  },
+  errorWrap: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: theme.spacing.xxl,
   },
 });
