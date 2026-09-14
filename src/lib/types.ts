@@ -21,10 +21,11 @@ export type ApiPost = {
   tags?: string[];
   category?: string;
   createdAt?: string;
+  isOutgoing?: boolean;
 };
 
 export type Message = ApiPost & {
-  direction: 'incoming' | 'outgoing';
+  direction: "incoming" | "outgoing";
 };
 
 export type PaginatedResponse<T> = {

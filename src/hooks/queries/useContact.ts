@@ -5,6 +5,6 @@ export function useContact(userId: number) {
   return useQuery({
     queryKey: ["contact", userId],
     queryFn: () => fetchUser(userId),
-    enabled: Boolean(userId),
+    enabled: !!userId,
   });
 }

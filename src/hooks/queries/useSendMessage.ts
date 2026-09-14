@@ -20,6 +20,7 @@ export function useSendMessage(userId: number) {
         title: "Message",
         body,
         createdAt: new Date().toISOString(),
+        isOutgoing: true,
       };
 
       queryClient.setQueryData<ApiPost[]>(queryKey, (old = []) => [
@@ -39,9 +40,6 @@ export function useSendMessage(userId: number) {
         const withoutOptimistic = old.filter((m) => m.id !== OPTIMISTIC_ID);
         return [...withoutOptimistic, newPost];
       });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey });
     },
   });
 }
