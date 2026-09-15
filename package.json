@@ -51,10 +51,10 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "build-configure": "eas build:configure",
-    "build-apk-dev": "eas build -p android --profile preview",
-    "build-apk-prod": "eas build -p android --profile production",
-    "build-ios-dev": "eas build -p ios --profile preview",
-    "build-ios-prod": "eas build -p ios --profile production"
+    "build-apk-dev": "expo lint && eas build -p android --profile preview",
+    "build-apk-prod": "expo lint && eas build -p android --profile production",
+    "build-ios-dev": "expo lint && eas build -p ios --profile preview",
+    "build-ios-prod": "expo lint && eas build -p ios --profile production"
   },
   "private": true
 }

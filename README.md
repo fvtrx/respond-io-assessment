@@ -1,56 +1,152 @@
-# Welcome to your Expo app 👋
+# Respond.io Assessment
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile messaging app built with Expo SDK 57 and Expo Router. The app includes a sign-in/sign-up flow, a conversation list, chat detail screens, profile views, and app-level state management powered by Zustand and React Query.
 
-## Get started
+## Stack
 
-1. Install dependencies
+- Expo SDK 57
+- React Native 0.86.3
+- Expo Router
+- TypeScript
+- TanStack Query
+- Zustand
+- FlashList
+- Expo Image / Linear Gradient / Blur / Haptics
+- Lucide React Native icons
+
+## Project structure
+
+```text
+.
+├── app.json
+├── eas.json
+├── package.json
+├── src/
+│   ├── app/
+│   │   ├── _layout.tsx
+│   │   ├── +not-found.tsx
+│   │   ├── auth.tsx
+│   │   ├── index.tsx
+│   │   ├── (tabs)/
+│   │   │   ├── _layout.tsx
+│   │   │   ├── index.tsx
+│   │   │   └── settings.tsx
+│   │   ├── chat/
+│   │   │   └── [id].tsx
+│   │   └── profile/
+│   │       └── [id].tsx
+│   ├── components/
+│   │   ├── Avatar.tsx
+│   │   ├── ChatListSkeleton.tsx
+│   │   ├── ConfirmModal.tsx
+│   │   ├── ConversationRow.tsx
+│   │   ├── EmptyState.tsx
+│   │   ├── GlassTabBar.tsx
+│   │   ├── MessageBubble.tsx
+│   │   ├── MessageSkeleton.tsx
+│   │   └── Skeleton.tsx
+│   ├── constants/
+│   │   └── theme.ts
+│   ├── hooks/
+│   │   ├── useFrameworkReady.ts
+│   │   └── queries/
+│   │       ├── index.ts
+│   │       ├── useContact.ts
+│   │       ├── useContactsInfinite.ts
+│   │       ├── useMessages.ts
+│   │       └── useSendMessage.ts
+│   ├── lib/
+│   │   ├── api.ts
+│   │   ├── countryCodes.ts
+│   │   ├── mockAuth.ts
+│   │   ├── queryClient.ts
+│   │   ├── theme.ts
+│   │   └── types.ts
+│   ├── store/
+│   │   ├── authStore.ts
+│   │   └── blockedContactStore.ts
+│   ├── utils/
+│   │   ├── format.ts
+│   │   ├── mapMessages.ts
+│   │   └── sentMessages.ts
+│   └── global.css
+├── assets/
+├── scripts/
+│   └── reset-project.js
+└── README.md
+```
+
+## Features
+
+- Authentication screen with country code selection and sign-in/sign-up logic
+- Persistent auth state via Zustand
+- Infinite or paginated contact list with search
+- Chat thread screens with message rendering and send flow
+- User profile routes and tabbed navigation
+- Custom theming, skeleton loading states, and glassmorphism-inspired UI
+- API integration with a remote backend and graceful local fallback behavior
+
+## Getting started
+
+1. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Start the Expo development server:
+
+   ```bash
+   npm start
+   ```
+
+   Or use:
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+3. Open the app in a simulator or device:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   - Android: `npm run android`
+   - iOS: `npm run ios`
+   - Web: `npm run web`
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## Available scripts
 
 ```bash
+npm start          # expo start
+npm run android    # expo start --android
+npm run ios        # expo start --ios
+npm run web        # expo start --web
+npm run lint       # expo lint
 npm run reset-project
+npm run build-configure
+npm run build-apk-dev
+npm run build-apk-prod
+npm run build-ios-dev
+npm run build-ios-prod
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## App flow
 
-### Other setup steps
+- The app bootstraps from `src/app/_layout.tsx`.
+- `src/app/auth.tsx` handles entry authentication logic.
+- `src/app/(tabs)/index.tsx` shows the conversation list and search experience.
+- `src/app/chat/[id].tsx` renders an individual conversation thread.
+- `src/app/profile/[id].tsx` renders a selected user profile.
+- `src/lib/api.ts` centralizes backend requests.
+- Zustand stores under `src/store/` manage authentication and blocked-contact state.
+- Query hooks under `src/hooks/queries/` provide data fetching and mutation logic.
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+## Notes
 
-## Learn more
+- This project uses file-based routing from Expo Router.
+- The app is configured through `app.json` and `eas.json` for Expo builds and deployment workflows.
+- The project uses a custom design system and lightweight mock/fallback logic for messaging interactions.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Related documentation
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [Expo SDK reference](https://docs.expo.dev/versions/v57.0.0/)
+- [Expo Router](https://docs.expo.dev/router/introduction)
+- [Expo CLI](https://docs.expo.dev/more/expo-cli/)
