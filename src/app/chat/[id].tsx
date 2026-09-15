@@ -9,16 +9,13 @@ import { router, useLocalSearchParams } from "expo-router";
 import {
   ArrowLeft,
   MessageSquareOff,
-  Mic,
-  Paperclip,
-  Phone,
   RefreshCw,
   Send,
   Smile,
-  Video,
 } from "lucide-react-native";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
@@ -30,6 +27,9 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import EmojiPicker, { type EmojiType } from "rn-emoji-keyboard";
+
+const MAX_MESSAGE_LENGTH = 500;
 
 export default function ChatScreen() {
   const params = useLocalSearchParams<{
@@ -42,6 +42,7 @@ export default function ChatScreen() {
   const contactAvatar = params.avatar || undefined;
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView>(null);
+  const inputRef = useRef<TextInput>(null);
 
   const {
     data: posts,
@@ -52,6 +53,8 @@ export default function ChatScreen() {
   } = useMessages(userId);
   const sendMessage = useSendMessage(userId);
   const [draft, setDraft] = useState("");
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const selectionRef = useRef({ start: 0, end: 0 });
 
   const messages: Message[] = useMemo(() => {
     return (posts ?? []).map((p) => ({
@@ -72,8 +75,30 @@ export default function ChatScreen() {
     const body = draft.trim();
     if (!body || sendMessage.isPending) return;
     setDraft("");
+    selectionRef.current = { start: 0, end: 0 };
     sendMessage.mutate(body);
   }, [draft, sendMessage]);
+
+  const openEmojiPicker = useCallback(() => {
+    Keyboard.dismiss();
+    setEmojiOpen(true);
+  }, []);
+
+  const closeEmojiPicker = useCallback(() => {
+    setEmojiOpen(false);
+    inputRef.current?.focus();
+  }, []);
+
+  const handleEmojiPick = useCallback((emoji: EmojiType) => {
+    const { start, end } = selectionRef.current;
+    setDraft((prev) => {
+      const next = prev.slice(0, start) + emoji.emoji + prev.slice(end);
+      if (next.length > MAX_MESSAGE_LENGTH) return prev;
+      const newPos = start + emoji.emoji.length;
+      selectionRef.current = { start: newPos, end: newPos };
+      return next;
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -111,22 +136,6 @@ export default function ChatScreen() {
             <Text style={styles.headerStatus}>Online</Text>
           </View>
         </TouchableOpacity>
-        <View style={styles.headerActions}>
-          <TouchableOpacity style={styles.iconBtn} activeOpacity={0.6}>
-            <Video
-              size={20}
-              color={theme.colors.textSecondary}
-              strokeWidth={2}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconBtn} activeOpacity={0.6}>
-            <Phone
-              size={20}
-              color={theme.colors.textSecondary}
-              strokeWidth={2}
-            />
-          </TouchableOpacity>
-        </View>
       </View>
 
       {isLoading ? (
@@ -208,25 +217,26 @@ export default function ChatScreen() {
             },
           ]}
         >
-          <TouchableOpacity style={styles.attachBtn} activeOpacity={0.6}>
-            <Paperclip
-              size={22}
-              color={theme.colors.neutral[400]}
-              strokeWidth={2}
-            />
-          </TouchableOpacity>
           <View style={styles.inputWrap}>
             <TextInput
+              ref={inputRef}
               style={styles.input}
               placeholder="Type a message..."
               placeholderTextColor={theme.colors.neutral[400]}
               value={draft}
               onChangeText={setDraft}
+              onSelectionChange={(e) => {
+                selectionRef.current = e.nativeEvent.selection;
+              }}
               multiline
-              maxLength={500}
+              maxLength={MAX_MESSAGE_LENGTH}
               editable={!isLoading}
             />
-            <TouchableOpacity style={styles.emojiBtn} activeOpacity={0.6}>
+            <TouchableOpacity
+              style={styles.emojiBtn}
+              activeOpacity={0.6}
+              onPress={openEmojiPicker}
+            >
               <Smile
                 size={20}
                 color={theme.colors.neutral[400]}
@@ -234,33 +244,47 @@ export default function ChatScreen() {
               />
             </TouchableOpacity>
           </View>
-          {draft.trim() ? (
-            <TouchableOpacity
-              style={[
-                styles.sendBtn,
-                sendMessage.isPending && styles.sendBtnDisabled,
-              ]}
-              onPress={handleSend}
-              disabled={sendMessage.isPending}
-              activeOpacity={0.7}
-            >
-              <Send
-                size={20}
-                color={theme.colors.textInverse}
-                strokeWidth={2}
-              />
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity style={styles.micBtn} activeOpacity={0.6}>
-              <Mic
-                size={22}
-                color={theme.colors.neutral[400]}
-                strokeWidth={2}
-              />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity
+            style={[
+              styles.sendBtn,
+              sendMessage.isPending && styles.sendBtnDisabled,
+              !draft.trim() && styles.sendBtnEmpty,
+            ]}
+            onPress={handleSend}
+            disabled={sendMessage.isPending}
+            activeOpacity={0.7}
+          >
+            <Send size={20} color={theme.colors.textInverse} strokeWidth={2} />
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+
+      <EmojiPicker
+        open={emojiOpen}
+        onClose={closeEmojiPicker}
+        onEmojiSelected={handleEmojiPick}
+        allowMultipleSelections
+        enableSearchBar
+        categoryPosition="top"
+        theme={{
+          backdrop: "#00000055",
+          knob: theme.colors.neutral[300],
+          container: theme.colors.surface,
+          header: theme.colors.textPrimary,
+          category: {
+            icon: theme.colors.neutral[400],
+            iconActive: theme.colors.primary[500],
+            container: theme.colors.neutral[50],
+            containerActive: theme.colors.primary[500] + "1a",
+          },
+          search: {
+            text: theme.colors.textPrimary,
+            placeholder: theme.colors.neutral[400],
+            icon: theme.colors.neutral[400],
+            background: theme.colors.neutral[50],
+          },
+        }}
+      />
     </View>
   );
 }
@@ -301,10 +325,6 @@ const styles = StyleSheet.create({
     fontFamily: theme.typography.fontFamilyRegular,
     color: theme.colors.accent[500],
     marginTop: 1,
-  },
-  headerActions: {
-    flexDirection: "row",
-    gap: theme.spacing.xs,
   },
   iconBtn: {
     width: 36,
@@ -375,6 +395,9 @@ const styles = StyleSheet.create({
   },
   sendBtnDisabled: {
     opacity: 0.5,
+  },
+  sendBtnEmpty: {
+    backgroundColor: theme.colors.neutral[300],
   },
   micBtn: {
     width: 42,

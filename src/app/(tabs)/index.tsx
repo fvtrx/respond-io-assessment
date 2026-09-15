@@ -7,12 +7,7 @@ import { theme } from "@/lib/theme";
 import type { ApiUser } from "@/lib/types";
 import { FlashList, type ListRenderItem } from "@shopify/flash-list";
 import { router } from "expo-router";
-import {
-  ChevronRight,
-  MessageSquareOff,
-  RefreshCw,
-  Search,
-} from "lucide-react-native";
+import { MessageSquareOff, RefreshCw, Search } from "lucide-react-native";
 import { useCallback, useMemo, useState } from "react";
 import {
   RefreshControl,
@@ -100,14 +95,6 @@ export default function ChatsScreen() {
           <View style={styles.pinnedSection}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Pinned Chats</Text>
-              <TouchableOpacity style={styles.seeAll} activeOpacity={0.6}>
-                <Text style={styles.seeAllText}>See all</Text>
-                <ChevronRight
-                  size={15}
-                  color={theme.colors.primary[500]}
-                  strokeWidth={2}
-                />
-              </TouchableOpacity>
             </View>
             <ScrollView
               horizontal
@@ -130,19 +117,6 @@ export default function ChatsScreen() {
             </ScrollView>
           </View>
         ) : null}
-
-        {/* <View style={styles.categoryBar}>
-          {CATEGORIES.map((cat) => (
-            <TouchableOpacity
-              key={cat}
-              style={[styles.categoryPill, activeCategory === cat && styles.categoryPillActive]}
-              onPress={() => setActiveCategory(cat)}
-              activeOpacity={0.7}
-            >
-              <Text style={[styles.categoryText, activeCategory === cat && styles.categoryTextActive]}>{cat}</Text>
-            </TouchableOpacity>
-          ))}
-        </View> */}
 
         {contacts.length > 0 ? (
           <Text style={styles.listHeading}>Recent Conversations</Text>
@@ -366,16 +340,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     textTransform: "uppercase",
     letterSpacing: 0.8,
-  },
-  seeAll: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 2,
-  },
-  seeAllText: {
-    fontSize: theme.typography.caption,
-    fontFamily: theme.typography.fontFamilyMedium,
-    color: theme.colors.primary[500],
   },
   pinnedRow: {
     gap: theme.spacing.md,
