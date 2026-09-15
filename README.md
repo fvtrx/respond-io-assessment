@@ -86,6 +86,18 @@ A mobile messaging app built with Expo SDK 57 and Expo Router. The app includes 
 - Custom theming, skeleton loading states, and glassmorphism-inspired UI
 - API integration with a remote backend and graceful local fallback behavior
 
+
+## App Screenshots
+| Screen | Snapshots | 
+| --- | --- | 
+| Sign In Screen | <img width="302" height="656" alt="Simulator Screenshot - iPhone 17 - 2026-09-15 at 15 09 36" src="https://github.com/user-attachments/assets/bc67d5eb-7ce6-4a5f-afe7-755670b1feac" /> |
+| Sign Up Screen | <img width="302" height="656" alt="Simulator Screenshot - iPhone 17 - 2026-09-15 at 15 09 42" src="https://github.com/user-attachments/assets/f30bf1a0-c637-428c-9a3b-3e978ce4eacb" /> |
+| Home (Chat List) | <img width="302" height="656" alt="Simulator Screenshot - iPhone 17 - 2026-09-15 at 15 10 00" src="https://github.com/user-attachments/assets/9fc0e4f7-48a3-431f-b30b-d6ac99b3ed43" />|
+| Chat Screen | <img width="302" height="656" alt="Simulator Screenshot - iPhone 17 - 2026-09-15 at 15 10 08" src="https://github.com/user-attachments/assets/380bd445-3340-4619-b89f-2697c4fc410a" />|
+| Profile Screen | <img width="302" height="656" alt="Simulator Screenshot - iPhone 17 - 2026-09-15 at 15 10 21" src="https://github.com/user-attachments/assets/60803ab4-1ee2-42b7-9b26-117158aa9aaf" />|
+| Settings Screen | <img width="302" height="656" alt="Simulator Screenshot - iPhone 17 - 2026-09-15 at 15 10 27" src="https://github.com/user-attachments/assets/ec7ab38e-30ff-41d6-baac-cf6a11bf605f" />|
+
+
 ## Getting started
 
 1. Install dependencies:
