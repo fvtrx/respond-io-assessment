@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontFamily: theme.typography.fontFamilyBold,
-    color: theme.colors.textPrimary,
+    color: theme.colors.primary[500],
   },
   content: {
     flex: 1,
