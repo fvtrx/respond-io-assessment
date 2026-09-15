@@ -1,29 +1,29 @@
 export type MockUser = {
   id: string;
-  email: string;
+  phone: string;
   name: string;
 };
 
 type StoredAccount = {
   id: string;
-  email: string;
+  phone: string;
   password: string;
   name: string;
 };
 
-const STORAGE_KEY = "respond_io_mock_accounts";
-const SESSION_KEY = "respond_io_mock_session";
+const STORAGE_KEY = "respond_io_assessment_mock_accounts";
+const SESSION_KEY = "respond_io_assessment_mock_session";
 
 const SEED_ACCOUNTS: StoredAccount[] = [
   {
     id: "1",
-    email: "test@respond.io",
+    phone: "+60123456789",
     password: "password123",
     name: "Test User",
   },
   {
     id: "2",
-    email: "demo@respond.io",
+    phone: "+60198765432",
     password: "password123",
     name: "Demo User",
   },
@@ -40,7 +40,7 @@ function loadAccounts(): StoredAccount[] {
 function saveExtraAccounts(accounts: StoredAccount[]) {
   try {
     const extra = accounts.filter(
-      (a) => !SEED_ACCOUNTS.some((s) => s.email === a.email),
+      (a) => !SEED_ACCOUNTS.some((s) => s.phone === a.phone),
     );
     localStorage.setItem(STORAGE_KEY, JSON.stringify(extra));
   } catch {}
@@ -65,47 +65,56 @@ function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function nameFromPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  return `User${digits.slice(-4)}`;
+}
+
 export const mockAuth = {
   async getSession(): Promise<MockUser | null> {
     await delay(150);
     return loadSession();
   },
 
-  async signIn(email: string, password: string): Promise<MockUser> {
+  async signIn(phone: string, password: string): Promise<MockUser> {
     await delay(600);
     const accounts = loadAccounts();
     const account = accounts.find(
-      (a) => a.email.toLowerCase() === email.toLowerCase(),
+      (a) => a.phone.replace(/\s/g, "") === phone.replace(/\s/g, ""),
     );
-    if (!account) throw new Error("No account found with that email.");
+    if (!account) throw new Error("No account found with that phone number.");
     if (account.password !== password)
       throw new Error("Incorrect password. Please try again.");
     const user: MockUser = {
       id: account.id,
-      email: account.email,
+      phone: account.phone,
       name: account.name,
     };
     saveSession(user);
     return user;
   },
 
-  async signUp(email: string, password: string): Promise<MockUser> {
+  async signUp(phone: string, password: string): Promise<MockUser> {
     await delay(600);
     const accounts = loadAccounts();
-    if (accounts.some((a) => a.email.toLowerCase() === email.toLowerCase())) {
-      throw new Error("An account with that email already exists.");
+    if (
+      accounts.some(
+        (a) => a.phone.replace(/\s/g, "") === phone.replace(/\s/g, ""),
+      )
+    ) {
+      throw new Error("An account with that phone number already exists.");
     }
     const newAccount: StoredAccount = {
       id: String(Date.now()),
-      email,
+      phone,
       password,
-      name: email.split("@")[0],
+      name: nameFromPhone(phone),
     };
     const all = [...accounts, newAccount];
     saveExtraAccounts(all);
     const user: MockUser = {
       id: newAccount.id,
-      email: newAccount.email,
+      phone: newAccount.phone,
       name: newAccount.name,
     };
     saveSession(user);

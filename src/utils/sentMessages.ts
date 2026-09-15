@@ -6,7 +6,7 @@ export type StoredMessage = {
 };
 
 function storageKey(accountId: string, contactId: number): string {
-  return `chatly_sent_${accountId}_${contactId}`;
+  return `respond_io_assessment_sent_${accountId}_${contactId}`;
 }
 
 function readMessages(accountId: string, contactId: number): StoredMessage[] {
