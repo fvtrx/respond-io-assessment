@@ -5,6 +5,7 @@ import {
 } from "@/lib/countryCodes";
 import { theme } from "@/lib/theme";
 import { useAuthStore } from "@/store/authStore";
+import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import {
@@ -14,7 +15,6 @@ import {
   Eye,
   EyeOff,
   LockKeyhole,
-  MessageCircle,
   Phone,
 } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -124,7 +124,7 @@ export default function AuthScreen() {
 
   return (
     <LinearGradient
-      colors={[theme.colors.primary[500], theme.colors.primary[700]]}
+      colors={[theme.colors.primary[50], theme.colors.primary[900]]}
       style={styles.background}
     >
       <KeyboardAvoidingView
@@ -136,14 +136,12 @@ export default function AuthScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.brand}>
-            <View style={styles.brandIcon}>
-              <MessageCircle
-                size={28}
-                color={theme.colors.primary[600]}
-                strokeWidth={2.4}
-              />
-            </View>
-            <Text style={styles.brandName}>Chatly</Text>
+            <Image
+              style={styles.brandIcon}
+              contentFit="contain"
+              source={require("@/assets/images/respond-io.png")}
+            />
+            <Text style={styles.brandSubtitle}>Mobile Dev Assessment</Text>
           </View>
 
           <View style={styles.card}>
@@ -420,20 +418,23 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   background: { flex: 1 },
   scroll: { flexGrow: 1, justifyContent: "center", padding: theme.spacing.lg },
-  brand: { alignItems: "center", marginBottom: theme.spacing.lg },
+  brand: {
+    alignItems: "center",
+    marginBottom: theme.spacing.lg,
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+    justifyContent: "center",
+  },
   brandIcon: {
-    width: 60,
-    height: 60,
-    borderRadius: 20,
-    backgroundColor: theme.colors.surface,
+    width: 120,
+    height: 24,
     alignItems: "center",
     justifyContent: "center",
   },
-  brandName: {
-    marginTop: theme.spacing.sm,
-    fontSize: theme.typography.title,
+  brandSubtitle: {
+    fontSize: theme.typography.caption,
     fontFamily: theme.typography.fontFamilyBold,
-    color: theme.colors.textInverse,
+    color: theme.colors.background,
   },
   card: {
     width: "100%",
